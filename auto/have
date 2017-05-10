@@ -1,0 +1,15 @@
+
+# Copyright (C) Igor Sysoev
+# Copyright (C) Nginx, Inc.
+
+#phoenix add #工具脚本
+#这个工具的作用是，将$have变量的值，宏定义为1，并输出到auto_config文件中。通常我们通过这个工具来控制是否打开某个特性。这个工具在使用前，需要先定义宏的名称
+#，即$have变量。
+
+cat << END >> $NGX_AUTO_CONFIG_H
+
+#ifndef $have
+#define $have  1
+#endif
+
+END
