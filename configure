@@ -73,6 +73,7 @@ fi
 . auto/modules  #phoenix add ## 生成模块列表
 . auto/lib/conf #phoenix add ## 配置库的依赖
 
+#phoenix add #configure接下来定义一些宏常量，主要是是文件路径方面的：
 case ".$NGX_PREFIX" in
     .)
         NGX_PREFIX=${NGX_PREFIX:-/usr/local/nginx}
@@ -110,8 +111,12 @@ have=NGX_HTTP_UWSGI_TEMP_PATH value="\"$NGX_HTTP_UWSGI_TEMP_PATH\""
 have=NGX_HTTP_SCGI_TEMP_PATH value="\"$NGX_HTTP_SCGI_TEMP_PATH\""
 . auto/define
 
+#phoenix add #configure最后的工作，生成编译安装的makefile
+# 生成objs/makefile文件
 . auto/make
+# 生成关于库的编译选项到makefile文件
 . auto/lib/make
+## 生成与安装相关的makefile文件内容，并生成最外层的makefile文件
 . auto/install
 
 # STUB
@@ -123,5 +128,5 @@ have=NGX_GROUP value="\"$NGX_GROUP\"" . auto/define
 if [ ".$NGX_BUILD" != "." ]; then
     have=NGX_BUILD value="\"$NGX_BUILD\"" . auto/define
 fi
-
+# 编译的最后阶段，汇总信息
 . auto/summary
