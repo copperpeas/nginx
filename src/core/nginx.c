@@ -191,6 +191,10 @@ main(int argc, char *const *argv)
     ngx_log_t        *log;
     ngx_uint_t        i;
     ngx_cycle_t      *cycle, init_cycle;
+    /*phoenix add
+    * 1. ngx_cycle_t : src/core/ngx_core.h  line 17 : typedef struct ngx_cycle_s           ngx_cycle_t;
+    * 2. ngx_cycle_s:  src/core/ngx_cycle.h  line 38 : struct ngx_cycle_s{....}
+    */
     ngx_conf_dump_t  *cd;
     ngx_core_conf_t  *ccf;
 

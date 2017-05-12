@@ -38,7 +38,10 @@ struct ngx_shm_zone_s {
 struct ngx_cycle_s {
     void                  ****conf_ctx;
     ngx_pool_t               *pool;
-
+    /* phoenix add
+    * 1.ngx_pool_t : src/core/ngx_core.h line 18  typedef struct ngx_pool_s            ngx_pool_t;
+    * 2.ngx_pool_s : src/core/ngx_palloc.h line 61  struct ngx_pool_s {....}
+    */
     ngx_log_t                *log;
     ngx_log_t                 new_log;
 

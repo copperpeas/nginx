@@ -14,7 +14,6 @@ static ngx_inline void *ngx_palloc_small(ngx_pool_t *pool, size_t size,
 static void *ngx_palloc_block(ngx_pool_t *pool, size_t size);
 static void *ngx_palloc_large(ngx_pool_t *pool, size_t size);
 
-
 ngx_pool_t *
 ngx_create_pool(size_t size, ngx_log_t *log)
 {
@@ -25,6 +24,9 @@ ngx_create_pool(size_t size, ngx_log_t *log)
         return NULL;
     }
 
+    //phoenix add //这里首申请了一块大小为size的内存区域(ngx_memalign(...))，其前sizeof(ngx_pool_t)（见下）字节用来存储ngx_pool_t这个结构体自身.
+    //所以若size小于sizeof(ngx_pool_t)将会有coredump的可能性。
+    //我们常用来分配内存的有三个接口:ngx_palloc(line 124)，ngx_pnalloc，ngx_pcalloc。
     p->d.last = (u_char *) p + sizeof(ngx_pool_t);
     p->d.end = (u_char *) p + size;
     p->d.next = NULL;

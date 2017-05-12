@@ -37,7 +37,11 @@ struct ngx_pool_cleanup_s {
     ngx_pool_cleanup_t   *next;
 };
 
-
+//phoenix add  Nginx里内存的使用大都十分有特色:申请了永久保存: 抑或伴随着请求的结束而全部释放,还有写满了缓冲再从头接着写.
+// 这么做的原因也主要取决于Web Server的特殊的场景内存的分配和请求相关：一条请求处理完毕,即可释放其相关的内存池,降低了开发中对内存资源管理的复杂度,
+//也减少了内存碎片的存在。所以，Nginx使用内存池时总是只申请,不释放,使用完毕后直接destroy整个内存池.我们来看下内存池相关的实现。
+//ngx_poll_large_s,ngx_pool_data_t, ngx_pool_s，这三个结构构成了基本的内存池的主体，并通过ngx_create_pool可以创建一个内存池，通过ngx_palloc可以从内存池中分配指定大小的内存。
+//-----------------nginx 内存分配相关数据结构 start-----------------------------------//
 typedef struct ngx_pool_large_s  ngx_pool_large_t;
 
 struct ngx_pool_large_s {
@@ -45,7 +49,7 @@ struct ngx_pool_large_s {
     void                 *alloc;
 };
 
-
+//phoenix add 
 typedef struct {
     u_char               *last;
     u_char               *end;
@@ -53,17 +57,20 @@ typedef struct {
     ngx_uint_t            failed;
 } ngx_pool_data_t;
 
-
+/*phoenix add
+* ngx_pool_s是ngx的内存池，每个工作线程都会持有一个，我们来看它的结构如下struct ngx_pool_s{...}
+*
+*/
 struct ngx_pool_s {
-    ngx_pool_data_t       d;
-    size_t                max;
-    ngx_pool_t           *current;
+    ngx_pool_data_t       d;    //*last ,*end, *next, failed.  //phoenix add 数据块
+    size_t                max;     //phoenix add 小块内存的最大值
+    ngx_pool_t           *current; //指向当前内存池
     ngx_chain_t          *chain;
-    ngx_pool_large_t     *large;
-    ngx_pool_cleanup_t   *cleanup;
+    ngx_pool_large_t     *large;  //*next, *alloc  //phoenix add 指向大块内存用，即超过max的内存请求。
+    ngx_pool_cleanup_t   *cleanup; //phoenix add 挂载一些内存池释放的时候，同时释放的资源。
     ngx_log_t            *log;
 };
-
+//-----------------nginx 内存分配相关数据结构 end-----------------------------------//
 
 typedef struct {
     ngx_fd_t              fd;
@@ -75,6 +82,7 @@ typedef struct {
 void *ngx_alloc(size_t size, ngx_log_t *log);
 void *ngx_calloc(size_t size, ngx_log_t *log);
 
+//phoenix add # ngx_create_pool用于
 ngx_pool_t *ngx_create_pool(size_t size, ngx_log_t *log);
 void ngx_destroy_pool(ngx_pool_t *pool);
 void ngx_reset_pool(ngx_pool_t *pool);
